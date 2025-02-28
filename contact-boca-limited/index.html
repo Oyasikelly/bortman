@@ -550,7 +550,7 @@ services@bocalimited.com					</p>
 
 							<input type="hidden" name="queried_id" value="73"/>
 			
-			<form class="elementor-form-fields-wrapper elementor-labels-above">
+			<form class="elementor-form-fields-wrapper form-container elementor-labels-above">
 								<div class="elementor-field-type-text elementor-field-group elementor-column elementor-field-group-name elementor-col-100 elementor-field-required">
 												<label for="form-field-name" class="elementor-field-label">
 								Name							</label>
@@ -561,10 +561,10 @@ services@bocalimited.com					</p>
 								Company							</label>
 														<input size="1" type="text" name="form_fields[field_862a3bd]" id="form-field-field_862a3bd" class="elementor-field elementor-size-md  elementor-field-textual" placeholder="Company" required="required" aria-required="true">
 											</div>
-								<div class="elementor-field-type-contact elementor-field-group elementor-column elementor-field-group-contact elementor-col-100 elementor-field-required">
-												<label for="form-field-contact" class="elementor-field-label">
-								Contact							</label>
-														<input size="1" type="contact" name="form_fields[contact]" id="form-field-contact" class="elementor-field elementor-size-md  elementor-field-textual" placeholder="contact" required="required" aria-required="true">
+								<div class="elementor-field-type-phone elementor-field-group elementor-column elementor-field-group-phone elementor-col-100 elementor-field-required">
+												<label for="form-field-phone" class="elementor-field-label">
+								Phone							</label>
+														<input size="1" type="number" name="form_fields[phone]" id="form-field-phone" class="elementor-field elementor-size-md  elementor-field-textual" placeholder="Phone number" required="required" aria-required="true">
 											</div>
 								<div class="elementor-field-type-email elementor-field-group elementor-column elementor-field-group-email elementor-col-100 elementor-field-required">
 												<label for="form-field-email" class="elementor-field-label">
@@ -596,6 +596,7 @@ services@bocalimited.com					</p>
 																						<span class="elementor-button-text">Send Message</span>
 													</span>
 					</button>
+					<p class="feedback"></p>
 				</div>
 			</div>
 		</form>
@@ -899,6 +900,11 @@ var ekit_config = {"ajaxurl":"https:\/\/bortlimited.com\/wp-admin\/admin-ajax.ph
 </script>
 <script src="../wp-content/plugins/elementskit-lite/widgets/init/assets/js/elementord617.js?ver=3.3.2" id="elementskit-elementor-js"></script>
 
+
+<!-- Install Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="/config.js"></script>
 <script>
 
 
@@ -921,6 +927,62 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// USING SUPABASE
+
+// console.log(CONFIG.SUPABASE_URL);
+// console.log(CONFIG.SUPABASE_ANON_KEY);
+
+// Initialize Supabase Client
+const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+// Select form and add submit event listener
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector(".form-container");
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevents the page from reloading
+
+    // Get form data
+    const name = document.getElementById("form-field-name").value;
+    const company = document.getElementById("form-field-field_862a3bd").value;
+    const phone = document.getElementById("form-field-phone").value;
+    const email = document.getElementById("form-field-email").value;
+    const serviceWanted = document.getElementById("form-field-field_dd1bd14").value;
+    const message = document.getElementById("form-field-message").value;
+
+
+	console.log(name,company,phone,email,serviceWanted,message)
+    // Validate fields (optional)
+    if (!name || !email || !message) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // Insert data into Supabase
+    const { data, error } = await supabase.from("Boca-contact-list").insert([
+      {
+        Name: name,
+        Company: company,
+        Phone: phone,
+        Email: email,
+        Service: serviceWanted,
+        Message: message
+      }
+    ]);
+
+	const messageContainer = document.createElement("p");
+messageContainer.style.color = "green";
+form.appendChild(messageContainer);
+
+if (!error) {
+  messageContainer.textContent = "Your message has been sent successfully!";
+  form.reset();
+} else {
+  messageContainer.textContent = "Submission failed. Please try again.";
+  messageContainer.style.color = "red";
+}
+  });
+});
 
 
 </script>
